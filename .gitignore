@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.env
+positions.json
+positions.json.tmp
+watch.json

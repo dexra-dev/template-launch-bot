@@ -1,0 +1,26 @@
+{
+  "name": "template-launch-bot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Solana launch sniper that buys only launches Dexra marks ok, with the Dexra guard re-checking every buy. Dry run by default.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20.18"
+  },
+  "scripts": {
+    "start": "node --env-file=.env --import tsx src/main.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --import tsx --test test/*.test.ts test/core/*.test.ts",
+    "dry-run": "node --env-file=.env --import tsx scripts/dry-run.ts"
+  },
+  "dependencies": {
+    "@dexra-dev/client": "0.1.1",
+    "@solana/kit": "8.5.0",
+    "tsx": "4.23.15"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "typescript": "5.9.3"
+  }
+}
