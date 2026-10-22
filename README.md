@@ -76,6 +76,25 @@ On first start the bot creates a `launches` watch with `createWatch` and saves i
 | `STOP_LOSS_PCT` | `30` | Sell when it is this much below cost. 0 turns it off. |
 | `EXIT_CHECK_SECONDS` | `30` | Seconds between exit checks. |
 
+## Already have a bot?
+
+You don't need this whole template to buy only what Dexra marks `ok`. [examples/whitelist-gate.ts](examples/whitelist-gate.ts) is one file that depends only on `@dexra-dev/client`. Copy it into your bot and call it right before your swap:
+
+```ts
+import { dexraAllowsBuy } from './whitelist-gate.js'
+
+const gate = await dexraAllowsBuy(mint, amountSol)
+if (!gate.allowed) return log('skip', mint, gate.reasons)
+await yourSwap(mint, amountSol)
+```
+
+- It runs `token_deep_check` and `swap_preflight` in parallel. The buy passes only if both say `ok`; `allowCaution: true` also accepts `caution`.
+- Without `DEXRA_API_KEY` it is off and allows every buy, so adding it changes nothing until you set a key.
+- On a Dexra error (402, 429, 5xx, network) it blocks the buy. Pass `failOpen: true` to keep buying as before and only log the reason.
+- Each check is two Dexra calls (see [Credits](#credits)). Run your own filters first so only real candidates reach it.
+
+Try it on one mint: `DEXRA_API_KEY=dxr_… npx tsx examples/whitelist-gate.ts <mint> 0.01`.
+
 ## How the guard works
 
 1. Intake keeps a launch only if its `new_launches` verdict is `ok` and it passes the liquidity and platform filters. Each mint is considered once.
@@ -101,6 +120,7 @@ src/
   log.ts         JSON logs
   main.ts        entry point
 scripts/dry-run.ts   one poll plus the BONK buy path, forced dry run
+examples/whitelist-gate.ts   standalone pre-buy gate for an existing bot
 test/            mocked tests (no network)
 ```
 
